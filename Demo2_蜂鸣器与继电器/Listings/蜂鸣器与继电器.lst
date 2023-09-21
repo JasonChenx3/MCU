@@ -1,0 +1,121 @@
+C51 COMPILER V9.60.0.0   ______________                                                    09/21/2023 20:22:04 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE ______________
+OBJECT MODULE PLACED IN .\Objects\·äÃùÆ÷Óë¼ÌµçÆ÷.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE ·äÃùÆ÷Óë¼ÌµçÆ÷.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Lis
+                    -tings\·äÃùÆ÷Óë¼ÌµçÆ÷.lst) TABS(2) OBJECT(.\Objects\·äÃùÆ÷Óë¼ÌµçÆ÷.obj)
+
+line level    source
+
+   1          #include "reg52.h"
+   2          #define uint unsigned int
+   3          
+   4          //sbit HC138_A = P2^5;
+   5          //sbit HC138_B = P2^6;
+   6          //sbit HC138_C = P2^7;
+   7          
+   8          void HC138(uint n) 
+   9          {
+  10   1        switch(n)
+  11   1        {
+  12   2          case 4:
+  13   2            P2 = (P2 & 0x1f) | 0x80;
+  14   2            break;
+  15   2          case 5:
+  16   2            P2 = (P2 & 0x1f) | 0xa0;
+  17   2            break;
+  18   2          case 6:
+  19   2            P2 = (P2 & 0x1f) | 0xc0;
+  20   2            break;
+  21   2          case 7:
+  22   2            P2 = (P2 & 0x1f) | 0xe0;
+  23   2            break;
+  24   2        }
+  25   1      }
+  26          
+  27          void OutPutP0(unsigned char channel, unsigned char dat)
+  28          {
+  29   1        HC138(channel);
+  30   1        P0 = dat;
+  31   1      }
+  32          
+  33          void Delay(uint t)
+  34          {
+  35   1        while (t--);
+  36   1        while (t--);
+  37   1      }
+  38          
+  39          void LEDRunning()
+  40          {
+  41   1        unsigned char i;
+  42   1        
+  43   1        for (i = 0; i < 3; i++)
+  44   1        {
+  45   2          OutPutP0(4, 0x00);
+  46   2          Delay(60000);
+  47   2          Delay(60000);
+  48   2          OutPutP0(4, 0xff);
+  49   2          Delay(60000);
+  50   2          Delay(60000);
+  51   2        }
+  52   1        
+  53   1        
+  54   1        // LED äº®
+C51 COMPILER V9.60.0.0   ______________                                                    09/21/2023 20:22:04 PAGE 2   
+
+  55   1        for (i = 1; i <= 8; i++)
+  56   1        {
+  57   2          OutPutP0(4, 0xff << i);
+  58   2          Delay(60000);
+  59   2          Delay(60000);
+  60   2        }
+  61   1        
+  62   1      //  // ç»§ç”µå™¨
+  63   1      //  OutPutP0(5, 0x10);  // é€‰é€šY5ï¼Œç»§ç”µå™¨å¸ä¸Š
+  64   1      //  Delay(60000);
+  65   1      //  Delay(60000);
+  66   1      //  OutPutP0(5, 0x00);  // é€‰é€šY5ï¼Œç»§ç”µå™¨æ–­å¼€
+  67   1      //  
+  68   1      //  // èœ‚é¸£å™¨
+  69   1      //  OutPutP0(5, 0x40);  // é€‰é€šY5ï¼Œèœ‚é¸£å™¨æ‰“å¼€
+  70   1      //  Delay(60000);
+  71   1      //  Delay(60000);
+  72   1      //  OutPutP0(5, 0x00);  // é€‰é€šY5ï¼Œèœ‚é¸£å™¨å…³é—­
+  73   1        
+  74   1        // LED ç­
+  75   1        for (i = 1; i <= 8; i ++)
+  76   1        {
+  77   2          OutPutP0(4, ~(0xff << i));
+  78   2          Delay(60000);
+  79   2          Delay(60000);
+  80   2        }
+  81   1      }
+  82          
+  83          void InitSystem()
+  84          {
+  85   1        OutPutP0(5, 0x00);
+  86   1      }
+  87          
+  88          void main()
+  89          {
+  90   1        InitSystem();
+  91   1        while (1)
+  92   1        {
+  93   2          LEDRunning();
+  94   2        }
+  95   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    199    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
