@@ -1,0 +1,98 @@
+C51 COMPILER V9.60.0.0   ________                                                          10/07/2023 16:19:19 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE ________
+OBJECT MODULE PLACED IN .\Objects\Õ‚≤ø÷–∂œ.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Õ‚≤ø÷–∂œ.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\
+                    -Õ‚≤ø÷–∂œ.lst) TABS(2) OBJECT(.\Objects\Õ‚≤ø÷–∂œ.obj)
+
+line level    source
+
+   1          #include <reg52.h>
+   2          #define uint unsigned int
+   3          #define uchar unsigned char
+   4          
+   5          sbit L1 = P0 ^ 0;
+   6          sbit L8 = P0 ^ 7;
+   7          
+   8          void Delay(uint t)
+   9          {
+  10   1        while(t -- );
+  11   1        while(t -- );
+  12   1        while(t -- );
+  13   1        while(t -- );
+  14   1      }
+  15          
+  16          void HC138(uchar channel)
+  17          {
+  18   1        switch(channel)
+  19   1        {
+  20   2          case 4:
+  21   2            P2 = (P2 & 0x1f) | 0x80;
+  22   2          break;
+  23   2          case 5:
+  24   2            P2 = (P2 & 0x1f) | 0xa0;
+  25   2          break;
+  26   2          case 6:
+  27   2            P2 = (P2 & 0x1f) | 0xc0;
+  28   2          break;
+  29   2          case 7:
+  30   2            P2 = (P2 & 0x1f) | 0xe0;
+  31   2          break;
+  32   2        }
+  33   1      }
+  34          
+  35          void Working()
+  36          {
+  37   1        HC138(4);
+  38   1        L1 = 0;
+  39   1        Delay(60000);
+  40   1        L1 = 1;
+  41   1        Delay(60000);
+  42   1      }
+  43          
+  44          // ‰∏≠Êñ≠ÂàùÂßãÂåñ
+  45          void Init_INT1()
+  46          {
+  47   1        IT1 = 1;
+  48   1        EX1 = 1;
+  49   1        EA = 1;
+  50   1      }
+  51          
+  52          // ‰∏≠Êñ≠ÂáΩÊï∞
+  53          void Service_INT1() interrupt 2
+  54          {
+C51 COMPILER V9.60.0.0   ________                                                          10/07/2023 16:19:19 PAGE 2   
+
+  55   1          L8 = 0;
+  56   1          Delay(60000);
+  57   1          Delay(60000);
+  58   1          Delay(60000);
+  59   1          Delay(60000);
+  60   1          Delay(60000);
+  61   1          Delay(60000);
+  62   1          L8 = 1;
+  63   1      }
+  64          
+  65          void main()
+  66          {
+  67   1        Init_INT1();
+  68   1        while(1)
+  69   1        {
+  70   2          Working();
+  71   2        }
+  72   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    178    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
