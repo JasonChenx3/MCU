@@ -3,5 +3,5 @@
 *.uvproj
 *.uvopt
 *.A51
-Objects/*
-Listings/*
+/**/Objects/*
+/**/Listings/*

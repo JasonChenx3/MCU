@@ -1,7 +1,0 @@
-".\Objects\Init.obj",
-".\Objects\Led.obj",
-".\Objects\Key.obj",
-".\Objects\Seg.obj",
-".\Objects\main.obj" 
-TO ".\Objects\定时器" 
-PRINT(".\Listings\定时器.m51") RAMSIZE(256) 

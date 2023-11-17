@@ -1,7 +1,0 @@
-".\Objects\main.obj",
-".\Objects\Init.obj",
-".\Objects\Led.obj",
-".\Objects\Key.obj",
-".\Objects\Seg.obj" 
-TO ".\Objects\20231024" 
-PRINT(".\Listings\20231024.m51") RAMSIZE(256) 
