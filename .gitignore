@@ -1,7 +1,8 @@
 # Keil
+.gitignore
 *.uvgui.Chen
 *.uvproj
 *.uvopt
 *.A51
-# /Objects
-# /Listings
+/Objects/*
+/Listings/*
