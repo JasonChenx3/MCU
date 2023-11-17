@@ -1,0 +1,201 @@
+C51 COMPILER V9.60.0.0   ____                                                              10/31/2023 21:40:43 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE ____
+OBJECT MODULE PLACED IN .\Objects\���.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE ���.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\���
+                    -.lst) TABS(2) OBJECT(.\Objects\���.obj)
+
+line level    source
+
+   1          #include <reg52.h>
+   2          #define uint unsigned int
+   3          #define uchar unsigned char
+   4          
+   5          sbit S4 = P3 ^ 3;
+   6          sbit S5 = P3 ^ 2;
+   7          
+   8          uchar t_m = 0;
+   9          uchar t_s = 0;
+  10          uchar t_005s = 0;
+  11          
+  12          unsigned char code SMG_NoDot[18] = 
+  13            {0xc0, 0xf9, 0xa4, 0xb0, 0x99, 0x92, 0x82, 0xf8, 
+  14             0x80, 0x90, 0x88, 0x83, 0xc6, 0xa1, 0x86, 0x8e,
+  15             0xbf, 0x7f};
+  16          
+  17          void HC138(uchar channel)
+  18          {
+  19   1        switch(channel)
+  20   1        {
+  21   2          case 0:
+  22   2            P2 = P2 & 0x1F;
+  23   2          break;
+  24   2          case 4:
+  25   2            P2 = (P2 & 0x1f) | 0x80;
+  26   2          break;
+  27   2          case 5:
+  28   2            P2 = (P2 & 0x1f) | 0xa0;
+  29   2          break;
+  30   2          case 6:
+  31   2            P2 = (P2 & 0x1f) | 0xc0;
+  32   2          break;
+  33   2          case 7:
+  34   2            P2 = (P2 & 0x1f) | 0xe0;
+  35   2          break;
+  36   2        }
+  37   1      }
+  38          
+  39          void DisplaySMG_Bit(uchar value, uchar pos)
+  40          {
+  41   1        HC138(7);
+  42   1        P0 = 0x00;
+  43   1        HC138(6);
+  44   1        P0 = 0x01 << pos;
+  45   1        HC138(7);
+  46   1        P0 = value;
+  47   1      }
+  48          
+  49          void DelaySMG(uint t)
+  50          {
+  51   1        while (t -- ) ;
+  52   1      }
+  53          
+  54          void DisplayTime()
+C51 COMPILER V9.60.0.0   ____                                                              10/31/2023 21:40:43 PAGE 2   
+
+  55          {
+  56   1        DisplaySMG_Bit(SMG_NoDot[t_005s % 10], 7);
+  57   1        DelaySMG(500);
+  58   1        DisplaySMG_Bit(SMG_NoDot[t_005s / 10], 6);
+  59   1        DelaySMG(500);
+  60   1        DisplaySMG_Bit(SMG_NoDot[16], 5);
+  61   1        DelaySMG(500);
+  62   1        
+  63   1        DisplaySMG_Bit(SMG_NoDot[t_s % 10], 4);
+  64   1        DelaySMG(500);
+  65   1        DisplaySMG_Bit(SMG_NoDot[t_s / 10], 3);
+  66   1        DelaySMG(500);
+  67   1        DisplaySMG_Bit(SMG_NoDot[16], 2);
+  68   1        DelaySMG(500);
+  69   1        
+  70   1        DisplaySMG_Bit(SMG_NoDot[t_m % 10], 1);
+  71   1        DelaySMG(500);
+  72   1        DisplaySMG_Bit(SMG_NoDot[t_m / 10], 0);
+  73   1        DelaySMG(500);
+  74   1      }
+  75          
+  76          //===========定时器相关函数=================
+  77          // 定时器初始化和启动
+  78          void InitTimer0()
+  79          {
+  80   1        TMOD = 0x01;
+  81   1        TH0 = (65535 - 50000) / 256;
+  82   1        TL0 = (65535 - 50000) % 256;
+  83   1        
+  84   1        ET0 = 1;
+  85   1        EA = 1;
+  86   1      //  TR0 = 1;
+  87   1      }
+  88          
+  89          // 定时器中断函数
+  90          void ServiceTimer0() interrupt 1
+  91          {
+  92   1        TH0 = (65535 - 50000) / 256;
+  93   1        TL0 = (65535 - 50000) % 256;
+  94   1        
+  95   1        t_005s ++ ;
+  96   1        if (t_005s == 20)
+  97   1        {
+  98   2          t_s ++ ;
+  99   2          t_005s = 0;
+ 100   2          if (t_s == 60)
+ 101   2          {
+ 102   3            t_m ++ ;
+ 103   3            t_s = 0;
+ 104   3          }
+ 105   2          if (t_m == 99)
+ 106   2          {
+ 107   3            t_m = 0;
+ 108   3          }
+ 109   2        }
+ 110   1      }
+ 111          //==========================================
+ 112          
+ 113          
+ 114          //===========按键相关函数=================
+ 115          // 按键去抖动
+ 116          void DelayK(uchar t) 
+C51 COMPILER V9.60.0.0   ____                                                              10/31/2023 21:40:43 PAGE 3   
+
+ 117          {
+ 118   1        while (t -- ) ;
+ 119   1      }
+ 120          
+ 121          // 按键扫描
+ 122          void ScanKeys()
+ 123          {
+ 124   1        // 秒表启动与暂停
+ 125   1        if (S4 == 0)
+ 126   1        {
+ 127   2          DelayK(100);
+ 128   2          if (S4 == 0)
+ 129   2          {
+ 130   3            TR0 = ~TR0;
+ 131   3            while (S4 == 0)
+ 132   3            {
+ 133   4              DisplayTime();
+ 134   4            }
+ 135   3          }
+ 136   2        }
+ 137   1        
+ 138   1        // 秒表清零
+ 139   1        if (S5 == 0)
+ 140   1        {
+ 141   2          DelayK(100);
+ 142   2          if (S5 == 0)
+ 143   2          {
+ 144   3            t_m = 0;
+ 145   3            t_s = 0;
+ 146   3            t_005s = 0;
+ 147   3            while (S5 == 0)
+ 148   3            {
+ 149   4              DisplayTime();
+ 150   4            }
+ 151   3          }
+ 152   2        }
+ 153   1      }
+ 154          //==========================================
+ 155          
+ 156          void InitSystem()
+ 157          {
+ 158   1        HC138(4);
+ 159   1        P0 = 0xff;
+ 160   1      }
+ 161          
+ 162          void main()
+ 163          {
+ 164   1        InitSystem();
+ 165   1        InitTimer0();
+ 166   1        while (1)
+ 167   1        {
+ 168   2          DisplayTime();
+ 169   2          ScanKeys();
+ 170   2        }
+ 171   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    343    ----
+   CONSTANT SIZE    =     18    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+C51 COMPILER V9.60.0.0   ____                                                              10/31/2023 21:40:43 PAGE 4   
+
+   DATA SIZE        =      3    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

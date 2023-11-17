@@ -1,0 +1,106 @@
+C51 COMPILER V9.60.0.0   MAIN                                                              10/25/2023 19:14:27 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\Driver) DEBUG OBJECTEXTEND PRI
+                    -NT(.\Listings\main.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          /* 头文件声明区域 */
+   2          #include <STC15F2K60S2.H>  // 15单片机寄存器专属头文件
+   3          #include <KEY.H>  // 按键底层专属头文件
+   4          #include <SEG.H>  // 数码管底层专属头文件
+   5          #include <INIT.h>  // 初始化底层专属头文件
+   6          #include <LED.H>  // LED底层专属头文件
+   7          
+   8          /* 变量声明区域 */
+   9          unsigned char Key_Slow_Down;  // 按键减速专用变量
+  10          unsigned char Key_Val, Key_Old, Key_Down, Key_Up;  // 按键扫描专用变量
+  11          unsigned int Seg_Slow_Down;  // 数码管减速专用变量
+  12          unsigned char Seg_Pos;  // 数码管扫描专用变量
+  13          unsigned char Seg_Buf[8] = {1, 2, 3, 4, 5, 6, 7, 8};  // 数码管数据显示数组 默认全部熄灭
+  14          unsigned char Seg_Point[8] = {1, 1, 1, 1, 1, 1, 1, 0};  // 数码管小数点数据数组 默认全部熄灭
+  15          
+  16          /* 按键处理函数 */
+  17          void Key_Proc()
+  18          {
+  19   1        if (Key_Slow_Down) return;
+  20   1        Key_Slow_Down = 1;  // 按键减速程序
+  21   1        
+  22   1        Key_Val = Key_Read();  // 实时读取键码值
+  23   1        Key_Down = Key_Val & (Key_Old ^ Key_Val);  // 读取按键下降沿
+  24   1        Key_Up = ~Key_Val & (Key_Old ^ Key_Val);  // 读取按键上升沿
+  25   1        Key_Old = Key_Val;  // 辅助扫描变量
+  26   1        
+  27   1        
+  28   1      }
+  29          
+  30          /* 信息处理函数 */
+  31          void Seg_Proc()
+  32          {
+  33   1        if (Seg_Slow_Down) return;
+  34   1        Seg_Slow_Down = 1;  // 数码管减速程序
+  35   1        
+  36   1        
+  37   1      }
+  38          
+  39          /* 其他显示函数 */
+  40          void Led_Proc()
+  41          {
+  42   1        
+  43   1      }
+  44          
+  45          /* 定时器0初始化函数 */
+  46          void Timer0_Init(void)    //1毫秒@12.000MHz
+  47          {
+  48   1        AUXR &= 0x7F;     //定时器时钟12T模式
+  49   1        TMOD &= 0xF0;     //设置定时器模式
+  50   1        TL0 = 0x18;       //设置定时初始值
+  51   1        TH0 = 0xFC;       //设置定时初始值
+  52   1        TF0 = 0;        //清除TF0标志
+  53   1        TR0 = 1;        //定时器0开始计时
+  54   1        ET0 = 1;
+C51 COMPILER V9.60.0.0   MAIN                                                              10/25/2023 19:14:27 PAGE 2   
+
+  55   1        EA = 1;
+  56   1      }
+  57          
+  58          /* 定时器0中断服务函数 */
+  59          void Timer0_Server() interrupt 1
+  60          {
+  61   1        if ( ++ Key_Slow_Down == 10) Key_Slow_Down = 0;
+  62   1        if ( ++ Seg_Slow_Down == 500) Seg_Slow_Down = 0; 
+  63   1        if ( ++ Seg_Pos == 8) Seg_Pos = 0;
+  64   1        Seg_Disp(Seg_Pos, Seg_Buf[Seg_Pos], Seg_Point[Seg_Pos]);
+  65   1        
+  66   1        
+  67   1      }
+  68          
+  69          /* Main */
+  70          void main()
+  71          {
+  72   1        Sys_Init();
+  73   1        Timer0_Init();
+  74   1        while(1)
+  75   1        {
+  76   2          Key_Proc();
+  77   2          Seg_Proc();
+  78   2          Led_Proc();
+  79   2        }
+  80   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    204    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     24    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
