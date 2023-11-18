@@ -143,4 +143,35 @@ unsigned char AT24C02_Read_Byte(unsigned char addr)
 	return dat;
 }
 
-
+// 以下函数为我们编写的PCF8591应用函数，注意控制字要根据实际情况修改
+unsigned char PCF8591_ADC() //因为PCF8591是8位AD转换，所以返回值是char型即可
+{
+	unsigned char dat;
+	do {
+		I2CStart();
+		I2CSendByte(0x90);  // 发送寻址+写控制字节
+	} while (I2CWaitAck());
+	I2CSendByte(0x03);  // 控制字：00000011B，选择模拟信号输入通道3，禁止模拟输出，禁止通道号自增
+	I2CWaitAck();  // 等待IIC设备应答
+	I2CStop();  // 发送总线停止信号
+	do {
+		I2CStart();
+		I2CSendByte(0x91);  // 发送地址+读控制
+	} while (I2CWaitAck());
+	dat = I2CReceiveByte();  // 读取ADC结果
+	I2CSendAck(1);  // 主机应答
+	I2CStop();  // 发送总线停止信号
+	return dat;  // 返回读取的数据
+}
+void PCF8591_DAC(unsigned char dat) // dat为待转换数据
+{
+	do {
+		I2CStart();
+		I2CSendByte(0x90); // 发送寻址+写命令帧
+	} while (I2CWaitAck());
+	I2CSendByte(0x40);  // 发送控制命令字，模拟输出允许
+	I2CWaitAck();  // IIC设备应答
+	I2CSendByte(dat);  // 发送待转换数据
+	I2CWaitAck();  // IIC设备应答
+	I2CStop();  // 发送总线停止信号
+}
