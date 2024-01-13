@@ -8,6 +8,25 @@
 
 sbit DQ = P1 ^ 4;
 
+void Delay750ms()		//@12.000MHz
+{
+	unsigned char data i, j, k;
+
+	_nop_();
+	_nop_();
+	i = 35;
+	j = 51;
+	k = 182;
+	do
+	{
+		do
+		{
+			while (--k);
+		} while (--j);
+	} while (--i);
+}
+
+
 //
 void Delay_OneWire(unsigned int t)
 {
@@ -76,6 +95,7 @@ float read_t()
 	init_ds18b20();
 	Write_DS18B20(0xCC);
 	Write_DS18B20(0x44);
+	Delay750ms();
 	init_ds18b20();
 	Write_DS18B20(0xCC);
 	Write_DS18B20(0xBE);

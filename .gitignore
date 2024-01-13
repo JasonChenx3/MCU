@@ -5,3 +5,6 @@
 *.A51
 /**/Objects/*
 /**/Listings/*
+
+# 压缩包
+*.rar
