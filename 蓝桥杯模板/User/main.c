@@ -1,9 +1,9 @@
 #include "main.h"
 
-unsigned char Key_Slow_Down, Seg_Slow_Down, Led_Slow_Down;  	// 减速变量
-unsigned char Key_Val, Key_Old, Key_Down, Key_Up;  						// 按键扫描
-unsigned char Seg_Buf[8] = {10, 10, 10, 10, 10, 10, 10, 10};  // 数码管显示控制
-unsigned char Seg_Point[8] = {0, 0, 0, 0, 0, 0, 0, 0};  			// 小数点控制: 0-熄灭 1-点亮
+unsigned char Key_Slow_Down, Seg_Slow_Down, Led_Slow_Down;
+unsigned char Key_Val, Key_Old, Key_Down, Key_Up;
+unsigned char Seg_Buf[8];
+unsigned char Seg_Point[8];
 
 
 void Key_Proc()
@@ -21,8 +21,15 @@ void Key_Proc()
 
 void Seg_Proc() 
 {
+	unsigned char i;
 	if (Seg_Slow_Down) return;
 	Seg_Slow_Down = 1;
+	
+	for (i = 0; i < 8; i ++ )
+	{
+		Seg_Buf[i] = 10;
+		Seg_Point[i] = 0;
+	}
 	
 	
 }
