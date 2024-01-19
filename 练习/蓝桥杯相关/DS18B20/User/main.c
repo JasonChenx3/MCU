@@ -76,12 +76,36 @@ void Timer0_Init(void)		//1∫¡√Î@12.000MHz
 	EA = 1;
 }
 
+void Delay750ms()		//@11.0592MHz
+{
+	unsigned char data i, j, k;
+
+	_nop_();
+	_nop_();
+	i = 32;
+	j = 133;
+	k = 87;
+	do
+	{
+		do
+		{
+			while (--k);
+		} while (--j);
+	} while (--i);
+}
 
 // Main
 void main()
 {
+	unsigned char i;
+	ftp = read_t();
+	Delay750ms();
 	Sys_Init();
 	Timer0_Init();
+	for (i = 0; i < 8; i ++ ) 
+	{
+		Led_Disp(i, 0);
+	}
 	while (1)
 	{
 		Key_Proc();

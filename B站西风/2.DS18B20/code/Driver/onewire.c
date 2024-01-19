@@ -5,7 +5,8 @@
 */
 
 #include <ONEWIRE.H>
-#define DQ P14
+
+sbit DQ = P1 ^ 4;
 
 //
 void Delay_OneWire(unsigned int t)
