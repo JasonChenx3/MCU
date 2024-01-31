@@ -52,18 +52,12 @@ void Timer0_Isr() interrupt 1
 	
 }
 
-void Info_Proc()
-{
-
-}
-
 void main()
 {
 	Sys_Init();
 	Timer0_Init();
 	while (1)
 	{
-		Info_Proc();
 		Key_Proc();
 		Seg_Proc();
 		Led_Proc();

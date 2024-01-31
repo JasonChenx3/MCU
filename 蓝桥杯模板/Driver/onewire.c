@@ -6,6 +6,8 @@
 
 #include <ONEWIRE.H>
 
+#define DQ P14
+
 //
 void Delay_OneWire(unsigned int t)
 {
