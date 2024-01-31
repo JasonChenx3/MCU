@@ -109,60 +109,38 @@ void I2CSendAck(unsigned char ackbit)
 }
 
 // 向AT24C02写
-void AT24C02_Write_Byte(unsigned char* write_dat, unsigned char addr, num)
+void AT24C02_Write_Byte(unsigned char addr, dat)
 {
-	// 选择芯片，确定写模式
 	do {
 		I2CStart();
 		I2CSendByte(0xA0);
 	} while (I2CWaitAck());
-	
-	// 写入地址帧
 	I2CSendByte(addr);
 	I2CWaitAck();
-	
-	while (num -- )
-	{
-		// 将数组的数据写入芯片
-		I2CSendByte(*write_dat ++ );
-		I2CWaitAck();
-	}
-	
+	I2CSendByte(dat);
+	I2CWaitAck();
 	I2CStop();
 }
 
 // 从AT24C02读
-void AT24C02_Read_Byte(unsigned char* read_dat, unsigned char addr, num)
+unsigned char AT24C02_Read_Byte(unsigned char addr)
 {
-
-	// 选择芯片，确定写模式
+	unsigned char dat;
 	do {
 		I2CStart();
 		I2CSendByte(0xA0);
 	} while (I2CWaitAck());
-	
-	// 写入地址帧
-	I2CSendByte(addr);
+	I2CSendByte(addr);  // 发送地址帧
 	I2CWaitAck();
-	
-	// 选择芯片，确定读模式
+	I2CStop();  // 重新启动IIC
 	do {
 		I2CStart();
 		I2CSendByte(0xA1);
 	} while (I2CWaitAck());
-	
-	while (num -- )
-	{
-		// 将读取的数据写入数组
-		*read_dat ++  = I2CReceiveByte();
-		// 根据剩余字节数发送应答信号
-		if (num)
-			I2CSendAck(0);
-		else
-			I2CSendAck(1);
-	}
-	
+	dat = I2CReceiveByte();
+	I2CSendAck(1);
 	I2CStop();
+	return dat;
 }
 
 // AD
