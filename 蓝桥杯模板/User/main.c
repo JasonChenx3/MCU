@@ -1,19 +1,17 @@
 #include "main.h"
 
-unsigned int Proc_Slow_Down;
-unsigned char Proc_Flag;
+unsigned char Key_Timer, Seg_Timer;
+bit Key_Valid, Seg_Valid;
 unsigned char Key_Val, Key_Old, Key_Down, Key_Up;
 unsigned char Seg_Buf[8] = {10, 10, 10, 10, 10, 10, 10, 10};
 unsigned char Seg_Point[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 unsigned char ucLed[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-float float_temperature;
-int int_temperature;
 
 void Key_Proc()
 {
-	if (Proc_Flag != 1) 
+	if (!Key_Valid) 
 		return;
-	Proc_Flag = 0;
+	Key_Valid = 0;
 	
 	Key_Val = Key_Read();
 	Key_Down = Key_Val & (Key_Val ^ Key_Old);
@@ -25,9 +23,9 @@ void Key_Proc()
 
 void Seg_Proc() 
 {
-	if (Proc_Flag != 2) 
+	if (!Seg_Valid) 
 		return;
-	Proc_Flag = 0;
+	Seg_Valid = 0;
 	
 }
 
@@ -38,17 +36,18 @@ void Led_Proc()
 
 void Timer0_Isr() interrupt 1 
 {
+	unsigned char i;
 	static unsigned int Pos = 0;
 	
-	Proc_Slow_Down = (Proc_Slow_Down + 1) % 500;
-	if (Proc_Slow_Down % 9 == 0)
-		Proc_Flag = 1;
-	if (Proc_Slow_Down % 49 == 0)
-		Proc_Flag = 2;
+	if ( ++ Key_Timer == 10)
+		Key_Valid = 1;
+	if ( ++ Seg_Timer == 50)
+		Seg_Valid = 1;
 	
 	Pos = (Pos + 1) % 8;
 	Seg_Disp(Pos, Seg_Buf[Pos], Seg_Point[Pos]);
 	Led_Disp(Pos, ucLed[Pos]);
+	
 	
 }
 

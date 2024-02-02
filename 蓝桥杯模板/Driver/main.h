@@ -9,5 +9,6 @@
 #include "DS1302.H"
 #include "IIC.H"
 #include "ONEWIRE.H"
+#include "ULTRASOUND.H"
 
 #endif
