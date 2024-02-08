@@ -1,17 +1,32 @@
-#include "main.h"
+#include <STC15F2K60S2.H>
+#include <stdio.h>
+#include <string.h>
+#include "SYS.H"
+#include "KEY.H"
+#include "LED.H"
+#include "SEG.H"
+//#include "DS1302.H"
+//#include "IIC.H"
+#include "ONEWIRE.H"
+//#include "ULTRASOUND.H"
+#include "UART.H"
 
 unsigned char Key_Timer, Seg_Timer;
 bit Key_Valid, Seg_Valid;
 unsigned char Key_Val, Key_Old, Key_Down, Key_Up;
-unsigned char Seg_Buf[8] = {0, 10, 10, 10, 10, 10, 10, 10};
+unsigned char Seg_Buf[8] = {10, 10, 10, 10, 10, 10, 10, 10};
 unsigned char Seg_Point[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 unsigned char ucLed[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+unsigned char Uart_Receive[10];
+unsigned char Uart_Receive_Index;
+unsigned char Uart_Send[10];
+float t;
+unsigned char cnt;
 
 void Key_Proc()
 {
-	if (!Key_Valid) 
-		return;
-	Key_Valid = 0;
+	if (Key_Timer) { return; }
+	Key_Timer = 1;
 	
 	Key_Val = Key_Read();
 	Key_Down = Key_Val & (Key_Val ^ Key_Old);
@@ -20,9 +35,11 @@ void Key_Proc()
 	
 	switch (Key_Down)
 	{
-		case 4 :
+		case 4:
 		{
-			Seg_Buf[0] ++ ;
+			sprintf(Uart_Send, "T = %.2f\r\n", t);
+			Uart_Send_String(Uart_Send);
+			cnt ++ ;
 			break;
 		}
 	}
@@ -30,10 +47,11 @@ void Key_Proc()
 
 void Seg_Proc() 
 {
-	if (!Seg_Valid) 
-		return;
+	if (!Seg_Valid) { return; }
 	Seg_Valid = 0;
 	
+	t = read_t();
+	Seg_Buf[7] = cnt % 10;
 }
 
 void Led_Proc() 
@@ -43,12 +61,10 @@ void Led_Proc()
 
 void Timer0_Isr() interrupt 1 
 {
-	unsigned char i;
 	static unsigned int Pos = 0;
 	
 	if ( ++ Key_Timer == 10)
 	{
-		Key_Valid = 1;
 		Key_Timer = 0;
 	}
 		
@@ -66,10 +82,20 @@ void Timer0_Isr() interrupt 1
 	
 }
 
+void Uart1_Isr() interrupt 4 
+{
+	if (RI == 1)
+	{
+		Uart_Receive[Uart_Receive_Index ++ ] = SBUF;
+		RI = 0;
+	}
+}
+
 void main()
 {
 	Sys_Init();
 	Timer0_Init();
+	UartInit();
 	while (1)
 	{
 		Key_Proc();
